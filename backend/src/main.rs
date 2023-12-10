@@ -4,11 +4,6 @@ mod schema;
 mod model;
 mod types;
 
-use db::{
-	establish_connection,
-	DbPool
-};
-
 use api::registration::{
 	signup,
 	login
@@ -32,13 +27,8 @@ async fn main() -> std::io::Result<()> {
 	}
 	env_logger::init();
 
-	// Setting up connection
-	let db_conn = establish_connection();
-	let db_pool = DbPool::new(db_conn).expect("Failed to create Database pool");
-
 	HttpServer::new( move || {
 		App::new()
-			.app_data(web::Data::new(db_pool.clone()))
 			.wrap(Logger::default())
 			.route("/signup", web::post().to(signup))
 			.route("/login", web::post().to(login))

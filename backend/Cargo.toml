@@ -11,7 +11,7 @@ env_logger = "0.10.0"
 serde = { version = "1.0.188", features = ["derive"] }
 rusqlite = { version = "0.29.0", features = ["bundled"] }
 dotenv = "0.15.0"
-diesel = { version = "2.1.1", features = ["sqlite", "chrono", "r2d2"] }
+diesel = { version = "2.1.1", features = ["postgres", "chrono", "r2d2"] }
 jwt = "0.16.0"
 sha2 = "0.10.7"
 hmac = "0.12.1"

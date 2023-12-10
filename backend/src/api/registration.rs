@@ -2,10 +2,9 @@ use crate::model::{
 	NewUser,
 	User
 };
-use crate::db::DbPool;
+use crate::db::establish_connection;
 use crate::schema::users::dsl::*;
 use crate::types::*;
-use crate::api::auth::generate_jwt;
 use crate::VResponse;
 
 use uuid::Uuid;
@@ -18,14 +17,11 @@ use actix_web::{
 
 use std::collections::HashMap;
 
-pub async fn signup(
-	payload: web::Json<VSignupPayload>,
-	pool: web::Data<DbPool>
-) -> HttpResponse {
+pub async fn signup(payload: web::Json<VSignupPayload>) -> HttpResponse {
 	let username: &String = &payload.name;
 	let password: &String = &payload.password;
 
-	let mut conn = pool.get().expect("Cannot get db connection from pool");
+	let mut conn = establish_connection();
 
 	let pw_hashed = bcrypt::hash(password)
 		.expect("Failed to hash password");
@@ -63,14 +59,11 @@ pub async fn signup(
 	return res;
 }
 
-pub async fn login(
-	payload: web::Json<VLoginPayload>,
-	pool: web::Data<DbPool>
-) -> HttpResponse {
+pub async fn login( payload: web::Json<VLoginPayload>) -> HttpResponse {
 	let username: &String = &payload.name;
 	let password: &String = &payload.password;
 
-	let mut conn = pool.get().expect("Cannot get db connection from pool");
+	let mut conn = establish_connection();
 	let result = users
 		.filter(name.eq(username))
 		.first::<User>(&mut conn);
@@ -83,9 +76,9 @@ pub async fn login(
 				];
 			}
 
-			let token: String = generate_jwt(user);
 			VResponse![
-				("token", &token)
+				("id", &user.id),
+				("name", &user.name)
 			]
 		},
 

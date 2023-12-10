@@ -2,16 +2,18 @@
 
 diesel::table! {
     files (id) {
-        id -> Text,
-        owner -> Text,
+        id -> Varchar,
+        owner -> Varchar,
+        name -> Varchar,
+        url -> Varchar,
     }
 }
 
 diesel::table! {
     users (id) {
-        id -> Text,
-        name -> Text,
-        hash -> Text,
+        id -> Varchar,
+        name -> Varchar,
+        hash -> Varchar,
     }
 }
 
