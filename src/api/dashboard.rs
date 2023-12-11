@@ -9,7 +9,8 @@ use diesel::prelude::*;
 use std::collections::HashMap;
 use actix_web::{
 	web,
-	HttpResponse
+	HttpResponse,
+	http::StatusCode
 };
 
 pub async fn fetch_user_files(mut db: PgConnection, user_id: &str) {
@@ -24,6 +25,6 @@ pub async fn dashboard(info: web::Path<(String,)>) -> HttpResponse {
 	let conn = establish_connection();
 
 	fetch_user_files(conn, &user_id).await;
-	VResponse![("msg", format!("test {}", user_id))]
+	VResponse![StatusCode::OK, ("msg", format!("test {}", user_id))]
 }
 

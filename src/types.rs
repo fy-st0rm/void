@@ -5,13 +5,13 @@ use serde::{
 
 #[macro_export]
 macro_rules! VResponse{
-	($($x: expr), *) => {
+	($c: expr, $($x: expr), *) => {
 		{
 			let mut resp = HashMap::new();
 			$(
 				resp.insert($x.0, $x.1);
 			)*
-			HttpResponse::Ok().json(resp)
+			HttpResponse::build($c).json(resp)
 		}
 	};
 }

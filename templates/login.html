@@ -1,0 +1,48 @@
+<DOCTYPE html>
+<html>
+	<head>
+		<title> Login </title>
+	</head>
+	<body>
+		<h2> Login </h2>
+		<form id="form">
+			Username: <input type="text" id="username"> <br>
+			Password: <input type="password" id="password"> <br>
+			<input type="submit" value="login">
+		</form>
+
+		Dont have an account? <a href="/signup">Signup</a>
+
+		<script>
+			const form = document.getElementById("form");
+			form.addEventListener("submit", async (e) => {
+				e.preventDefault();
+
+				username = document.getElementById("username").value;
+				password = document.getElementById("password").value;
+
+				const params = {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						"Accept": "*/*",
+					},
+					body: JSON.stringify({ name: username, password: password })
+				};
+				await fetch("/api_login", params)
+					.then(async (response) => {
+						let result = await response.text();
+						let data = JSON.parse(result);
+						if (response.ok) {
+							console.log(data.id, data.name);
+						} else {
+							alert(data.msg);
+						}
+					})
+					.catch((err) => {
+						alert(err);
+					})
+			});
+		</script>
+	</body>
+</html>

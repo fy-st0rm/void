@@ -7,17 +7,19 @@ use crate::schema::users::dsl::*;
 use crate::types::*;
 use crate::VResponse;
 
+use log::debug;
 use uuid::Uuid;
 use pwhash::bcrypt;
 use diesel::prelude::*;
 use actix_web::{
 	web,
-	HttpResponse
+	HttpResponse,
+	http::StatusCode
 };
 
 use std::collections::HashMap;
 
-pub async fn signup(payload: web::Json<VSignupPayload>) -> HttpResponse {
+pub async fn api_signup(payload: web::Json<VSignupPayload>) -> HttpResponse {
 	let username: &String = &payload.name;
 	let password: &String = &payload.password;
 
@@ -40,6 +42,7 @@ pub async fn signup(payload: web::Json<VSignupPayload>) -> HttpResponse {
 	let res: HttpResponse = match result {
 		Ok(_) => {
 			VResponse![
+				StatusCode::BAD_REQUEST,
 				("msg", format!("Account with name {} already exists.", username))
 			]
 		},
@@ -51,6 +54,7 @@ pub async fn signup(payload: web::Json<VSignupPayload>) -> HttpResponse {
 				.expect(&format!("Error saving new user: {}", username));
 
 			VResponse![
+				StatusCode::OK,
 				("msg", format!("Sucessfully created account: {}", username))
 			]
 		}
@@ -59,7 +63,7 @@ pub async fn signup(payload: web::Json<VSignupPayload>) -> HttpResponse {
 	return res;
 }
 
-pub async fn login( payload: web::Json<VLoginPayload>) -> HttpResponse {
+pub async fn api_login( payload: web::Json<VLoginPayload>) -> HttpResponse {
 	let username: &String = &payload.name;
 	let password: &String = &payload.password;
 
@@ -72,11 +76,13 @@ pub async fn login( payload: web::Json<VLoginPayload>) -> HttpResponse {
 		Ok(user) => {
 			if !bcrypt::verify(password, &user.hash) {
 				return VResponse![
+					StatusCode::BAD_REQUEST,
 					("msg", "Invalid password.")
 				];
 			}
 
 			VResponse![
+				StatusCode::OK,
 				("id", &user.id),
 				("name", &user.name)
 			]
@@ -84,6 +90,7 @@ pub async fn login( payload: web::Json<VLoginPayload>) -> HttpResponse {
 
 		Err(_) => {
 			VResponse![
+				StatusCode::BAD_REQUEST,
 				("msg", format!("Account with name {} doesnt exists.", username))
 			]
 		}

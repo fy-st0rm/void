@@ -17,3 +17,5 @@ sha2 = "0.10.7"
 hmac = "0.12.1"
 pwhash = "1.0.0"
 uuid = { version = "1.4.1", features = ["v4"] }
+log = "0.4.20"
+actix-cors = "0.6.5"
