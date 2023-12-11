@@ -1,8 +1,6 @@
 use crate::db::establish_connection;
-use crate::schema::users::dsl::*;
 use crate::schema::files::dsl::*;
-use crate::model::{ NewFile, File };
-use crate::types::*;
+use crate::model::File;
 use crate::VResponse;
 use diesel::prelude::*;
 
@@ -13,18 +11,28 @@ use actix_web::{
 	http::StatusCode
 };
 
-pub async fn fetch_user_files(mut db: PgConnection, user_id: &str) {
-	let result = files
-		.filter(owner.eq(user_id))
-		.load::<File>(&mut db);
-	println!("{:?}", result);
-}
-
 pub async fn api_dashboard(info: web::Path<(String,)>) -> HttpResponse {
 	let user_id: String = info.into_inner().0;
-	let conn = establish_connection();
+	let mut conn = establish_connection();
 
-	fetch_user_files(conn, &user_id).await;
-	VResponse![StatusCode::OK, ("msg", format!("test {}", user_id))]
+	let result = files
+		.filter(owner.eq(&user_id))
+		.load::<File>(&mut conn);
+
+	let res = match result {
+		Ok(stored_files) => {
+			let mut response = HashMap::new();
+			for file in stored_files {
+				response.insert(file.id, file.name);
+			}
+
+			HttpResponse::build(StatusCode::OK).json(response)
+		},
+		Err(err) => {
+			VResponse![StatusCode::BAD_REQUEST, ("msg", format!("{}", err))]
+		}
+	};
+
+	return res;
 }
 

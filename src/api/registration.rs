@@ -1,23 +1,18 @@
-use crate::model::{
-	NewUser,
-	User
-};
-use crate::db::establish_connection;
-use crate::schema::users::dsl::*;
-use crate::types::*;
-use crate::VResponse;
-
-use log::debug;
 use uuid::Uuid;
 use pwhash::bcrypt;
 use diesel::prelude::*;
+use std::collections::HashMap;
 use actix_web::{
 	web,
 	HttpResponse,
 	http::StatusCode
 };
 
-use std::collections::HashMap;
+use crate::model::{ NewUser, User };
+use crate::db::establish_connection;
+use crate::schema::users::dsl::*;
+use crate::types::*;
+use crate::VResponse;
 
 pub async fn api_signup(payload: web::Json<VSignupPayload>) -> HttpResponse {
 	let username: &String = &payload.name;

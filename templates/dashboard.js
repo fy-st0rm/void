@@ -51,15 +51,7 @@ const upload_file = async (form) => {
 	return response;
 }
 
-window.onload = () => {
-	const user_details_p = document.getElementById("user_details");
-	let id = localStorage.getItem("id");
-	let name = localStorage.getItem("name");
-	user_details_p.innerHTML = `
-		Name: ${name}<br>
-		Id: ${id}<br>
-	`;
-
+const handle_form = async () => {
 	const form = document.getElementById("form");
 	form.addEventListener("submit", async (e) => {
 		e.preventDefault();
@@ -80,4 +72,63 @@ window.onload = () => {
 
 		location.reload();
 	})
+}
+
+const add_event_listener = (element) => {
+	element.addEventListener("click", async () => {
+		await fetch(`/api_download_file/${element.id}`, { method: "GET" })
+			.then(res => res.blob())
+			.then(blob => {
+				let url = window.URL.createObjectURL(blob);
+
+				const link = document.createElement('a');
+				link.href = url;
+				link.setAttribute('download', element.name);
+				document.body.appendChild(link);
+				link.click();
+			})
+			.catch(err => alert(err));
+	});
+}
+
+const display_files = (files) => {
+	const div = document.getElementById("files");
+
+	for (let id in files) {
+		let name = files[id];
+
+		let anchor = document.createElement("a");
+		anchor.setAttribute("id", id);
+		anchor.setAttribute("name", name);
+		anchor.setAttribute("href", "#");
+		anchor.innerHTML = name;
+
+		let br = document.createElement("br");
+		div.appendChild(anchor);
+		div.appendChild(br);
+
+		add_event_listener(anchor);
+	}
+}
+
+window.onload = async () => {
+	const user_details_p = document.getElementById("user_details");
+	let id = localStorage.getItem("id");
+	let name = localStorage.getItem("name");
+	user_details_p.innerHTML = `
+		Name: ${name}<br>
+		Id: ${id}<br>
+	`;
+
+	let response = await fetch(`/api_dashboard/${id}`, { method: "GET" });
+	let text = await response.text();
+	let data = JSON.parse(text);
+	if (!response.ok) {
+		alert(data.msg);
+		return;
+	}
+
+	display_files(data);
+
+	await handle_form();
 }

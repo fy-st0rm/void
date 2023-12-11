@@ -8,29 +8,13 @@ mod web_routes;
 use log::info;
 use std::fs;
 use actix_files as afs;
-use actix_web::{
-	web,
-	App,
-	HttpServer,
-	middleware::Logger,
-};
+use actix_web::{ web, App, HttpServer, middleware::Logger, };
 use actix_cors::Cors;
 
-use api::registration::{
-	api_signup,
-	api_login
-};
+use api::registration::{ api_signup, api_login };
 use api::api_dashboard::api_dashboard;
-use api::file_transfer::{
-	api_upload_register,
-	api_upload_file
-};
-use web_routes::{
-	index,
-	login,
-	signup,
-	dashboard
-};
+use api::file_transfer::{ api_upload_register, api_upload_file, api_download_file };
+use web_routes::{ index, login, signup, dashboard };
 
 
 const SERVER_IP: &str  = "127.0.0.1";
@@ -74,6 +58,7 @@ async fn main() -> std::io::Result<()> {
 			.route("/api_dashboard/{user_id}", web::get().to(api_dashboard))
 			.route("/api_upload_register", web::post().to(api_upload_register))
 			.route("/api_upload_file", web::post().to(api_upload_file))
+			.route("/api_download_file/{file_id}", web::get().to(api_download_file))
 	})
 	.bind(("127.0.0.1", 3000))?
 	.run()

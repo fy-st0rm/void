@@ -1,6 +1,6 @@
 use log::debug;
 use actix_multipart::Multipart;
-use actix_web::{ web, HttpResponse, Error, http::StatusCode };
+use actix_web::{ web, HttpRequest, HttpResponse, Error, http::StatusCode };
 use futures_util::TryStreamExt as _;
 use uuid::Uuid;
 use std::io::Write;
@@ -69,5 +69,36 @@ pub async fn api_upload_file(mut payload: Multipart) -> Result<HttpResponse, Err
 	Ok(HttpResponse::Ok().body("Sucessfully uploaded file."))
 }
 
-pub async fn api_download() {
+pub async fn api_download_file(req: HttpRequest, info: web::Path<(String,)>) -> HttpResponse {
+	let file_id: String = info.into_inner().0;
+	let mut conn = establish_connection();
+
+	let result = files
+		.filter(id.eq(&file_id))
+		.first::<File>(&mut conn);
+
+	match result {
+		Ok(file) => {
+			let filepath = format!("./storage/{}", file.name);
+			let file = actix_files::NamedFile::open_async(filepath).await;
+
+			match file {
+				Ok(f) => {
+					f.into_response(&req)
+				},
+				Err(err) => {
+					VResponse![
+						StatusCode::BAD_REQUEST,
+						("msg", format!("{}", err))
+					]
+				}
+			}
+		},
+		Err(err) => {
+			VResponse![
+				StatusCode::BAD_REQUEST,
+				("msg", format!("{}", err))
+			]
+		}
+	}
 }
