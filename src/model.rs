@@ -28,14 +28,12 @@ pub struct User {
 pub struct NewFile <'a> {
 	pub id: &'a str,
 	pub owner: &'a str,
-	pub name: &'a str,
-	pub url: &'a str
+	pub name: &'a str
 }
 
 #[derive(Queryable, Debug, AsChangeset)]
 pub struct File {
 	pub id: String,
 	pub owner: String,
-	pub name: String,
-	pub url: String
+	pub name: String
 }

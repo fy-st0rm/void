@@ -16,7 +16,6 @@ macro_rules! VResponse{
 	};
 }
 
-
 #[derive(Serialize, Deserialize)]
 pub struct VLoginPayload {
 	pub name: String,
@@ -29,3 +28,8 @@ pub struct VSignupPayload {
 	pub password: String
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct VUploadPayload{
+	pub owner_id: String,
+	pub filename: String
+}

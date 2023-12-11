@@ -20,7 +20,7 @@ pub async fn fetch_user_files(mut db: PgConnection, user_id: &str) {
 	println!("{:?}", result);
 }
 
-pub async fn dashboard(info: web::Path<(String,)>) -> HttpResponse {
+pub async fn api_dashboard(info: web::Path<(String,)>) -> HttpResponse {
 	let user_id: String = info.into_inner().0;
 	let conn = establish_connection();
 

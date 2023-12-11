@@ -34,7 +34,10 @@
 						let result = await response.text();
 						let data = JSON.parse(result);
 						if (response.ok) {
-							console.log(data.id, data.name);
+							localStorage.setItem("id", data.id);
+							localStorage.setItem("name", data.name);
+
+							window.location.href = "/dashboard";
 						} else {
 							alert(data.msg);
 						}

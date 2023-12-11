@@ -5,7 +5,6 @@ diesel::table! {
         id -> Varchar,
         owner -> Varchar,
         name -> Varchar,
-        url -> Varchar,
     }
 }
 
